@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: "sample"
+  sleuth:
+    enabled: true
+    propagation.type: W3C
+    sampler.probability: 1.0
+    reactor:
+      instrumentation-type: DECORATE_QUEUES
+    otel:
+      config.trace-id-ratio-based: 1
+      log.slf4j.enabled: true
+      propagation.sleuth-baggage.enabled: true
+      exporter:
+        otlp:
+          enabled: false
+          timeout: 1000
+    baggage:
+      remote-fields: my-baggage
+      correlation-fields: my-baggage
+      tag-fields: my-baggage
+
+logging:
+  pattern:
+    level: "%5p [${spring.zipkin.service.name:${spring.application.name:-}},%X{traceId:-},%X{spanId:-},%X{my-baggage:-}]"
+
+server:
+  compression:
+    enabled: true
+  error:
+    include-binding-errors: never
+    include-exception: false
+    include-message: never
+    include-stacktrace: never
+    whitelabel:
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
